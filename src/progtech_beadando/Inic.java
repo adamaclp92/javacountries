@@ -1,13 +1,17 @@
 package progtech_beadando;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -19,6 +23,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputMethodListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.Color;
+import javax.swing.UIManager;
+import javax.swing.ImageIcon;
+import javax.swing.border.TitledBorder;
+import javax.swing.border.LineBorder;
 
 
 public class Inic extends JFrame {
@@ -38,14 +51,17 @@ public class Inic extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(0, 204, 0));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		JScrollPane countries = new JScrollPane();
+		countries.setViewportBorder(new LineBorder(new Color(0, 204, 0), 1, true));
 		countries.setBounds(21, 142, 382, 108);
 		contentPane.add(countries);
 		
+		//a a táblában valamelyik adatra rákattintunk, akkor a column és a row változóba kerül letárolásra a sor és az oszlop
 		country = new JTable();
 		country.addMouseListener(new MouseAdapter() {
 			@Override
@@ -67,45 +83,114 @@ public class Inic extends JFrame {
 			}
 		));
 		
-		JButton btnNewCountry = new JButton("\u00DAj orsz\u00E1g");
+		//új ország gombra kattintva AddCountryWindow frame
+		JButton btnNewCountry = new JButton("\u00DAj orsz\u00E1g hozz\u00E1ad\u00E1sa");
 		btnNewCountry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addCountryWindow();
 			}
 		});
-		btnNewCountry.setBounds(10, 43, 89, 23);
+		btnNewCountry.setBounds(239, 55, 164, 23);
 		contentPane.add(btnNewCountry);
 		
-		JButton btnSearch = new JButton("Keres\u00E9s");
-		btnSearch.addActionListener(new ActionListener() {
+		//Tartalom törlése gomb, a két text szövegét kitörli
+		JButton btnRefresh = new JButton("Tartalom t\u00F6rl\u00E9se");
+		btnRefresh.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				list(country, "SELECT * FROM countries WHERE nationality_mark LIKE "
-						+ "'%"+ textNationality.getText() +"%' "
-						+ "AND country LIKE '%"+ textCountry.getText() +"%'");
+			textNationality.setText("");
+			textCountry.setText("");
 			}
 		});
-		btnSearch.setBounds(208, 89, 89, 23);
-		contentPane.add(btnSearch);
-		
-		JButton btnRefresh = new JButton("Friss\u00EDt\u00E9s");
-		btnRefresh.setBounds(314, 89, 89, 23);
+		btnRefresh.setBounds(239, 108, 164, 23);
 		contentPane.add(btnRefresh);
 		
 		JLabel lblNewLabel = new JLabel("Orsz\u00E1g karbantart\u00F3");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
-		lblNewLabel.setBounds(129, 11, 182, 23);
+		lblNewLabel.setBounds(194, 11, 182, 23);
 		contentPane.add(lblNewLabel);
 		
 		textNationality = new JTextField();
-		textNationality.setBounds(21, 90, 65, 22);
+		textNationality.setBackground(Color.WHITE);
+		
+		//nationality text-be írásnál szûrés
+		textNationality.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				list(country, "SELECT * FROM countries WHERE nationality_mark LIKE "
+						+ "'%"+ textNationality.getText() +"%' "
+						+ "AND country LIKE '%"+ textCountry.getText() +"%'");	
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				list(country, "SELECT * FROM countries WHERE nationality_mark LIKE "
+						+ "'%"+ textNationality.getText() +"%' "
+						+ "AND country LIKE '%"+ textCountry.getText() +"%'");	
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				list(country, "SELECT * FROM countries WHERE nationality_mark LIKE "
+						+ "'%"+ textNationality.getText() +"%' "
+						+ "AND country LIKE '%"+ textCountry.getText() +"%'");	
+			}});
+		
+		textNationality.setBounds(21, 109, 65, 22);
 		contentPane.add(textNationality);
 		textNationality.setColumns(10);
 		
 		textCountry = new JTextField();
-		textCountry.setBounds(96, 90, 86, 20);
+		textCountry.setBackground(Color.WHITE);
+		
+		//country text-be való írásnál szûrés, insertnél figyeli, hogy a text hossza min 3 legyen
+		textCountry.getDocument().addDocumentListener(new DocumentListener() {
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				if(textCountry.getText().length() >= 3) {
+				list(country, "SELECT * FROM countries WHERE nationality_mark LIKE "
+						+ "'%"+ textNationality.getText() +"%' "
+						+ "AND country LIKE '%"+ textCountry.getText() +"%'");	
+				}
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				list(country, "SELECT * FROM countries WHERE nationality_mark LIKE "
+						+ "'%"+ textNationality.getText() +"%' "
+						+ "AND country LIKE '%"+ textCountry.getText() +"%'");	
+				
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				if(textCountry.getText().length() >= 3) {
+				list(country, "SELECT * FROM countries WHERE nationality_mark LIKE "
+						+ "'%"+ textNationality.getText() +"%' "
+						+ "AND country LIKE '%"+ textCountry.getText() +"%'");	
+				}
+				
+			}});
+
+		textCountry.setBounds(96, 109, 86, 22);
 		contentPane.add(textCountry);
 		textCountry.setColumns(10);
+		
+		JLabel lblNewLabel_1 = new JLabel("Fels\u00E9gjel:");
+		lblNewLabel_1.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+		lblNewLabel_1.setBounds(21, 89, 65, 14);
+		contentPane.add(lblNewLabel_1);
+		
+		JLabel lblNewLabel_2 = new JLabel("Orsz\u00E1g:");
+		lblNewLabel_2.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+		lblNewLabel_2.setBounds(96, 89, 86, 14);
+		contentPane.add(lblNewLabel_2);
+		
+		JLabel lblNewLabel_3 = new JLabel("New label");
+		lblNewLabel_3.setIcon(new ImageIcon(Inic.class.getResource("/images/pngwing.com.png")));
+		lblNewLabel_3.setBounds(-14, 11, 182, 67);
+		contentPane.add(lblNewLabel_3);
 		
 		repaint();
 		validate();
@@ -115,6 +200,7 @@ public class Inic extends JFrame {
 	public void refresh() {
 			list(country, "SELECT * FROM countries");
 	}
+	
 	
 	public void list(JTable table, String query) {
 		try {
@@ -142,6 +228,8 @@ public class Inic extends JFrame {
 		}
 	}
 	
+	
+	
 	public void addCountryWindow() {
 		new AddCountryWindow(this);
 	}
@@ -149,6 +237,5 @@ public class Inic extends JFrame {
 	public void updateCountryWindow(int row) {
 		new UpdateCountryWindow(this, Integer.parseInt((String)((DefaultTableModel)country.getModel()).getValueAt(row, 0)));
 	}
-
 }
 

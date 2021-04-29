@@ -50,6 +50,8 @@ public class UpdateCountryWindow extends JFrame {
 		lblNewLabel_2.setBounds(10, 99, 67, 14);
 		contentPane.add(lblNewLabel_2);
 		
+		
+		//Update button: valamelyik text üres, akkor üzenet, különben pedig update és mainwindow tábla refresh
 		JButton btnUpdateCountry = new JButton("M\u00F3dos\u00EDt\u00E1s");
 		btnUpdateCountry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -84,6 +86,7 @@ public class UpdateCountryWindow extends JFrame {
 		textCountry.setBounds(102, 96, 86, 20);
 		contentPane.add(textCountry);
 		
+		//A két text-be betöltõdik az az ország, amelyikre a táblázatban rá lett kattintva
 		try {
 			stm = con.createStatement();
 			ResultSet rs = stm.executeQuery("SELECT * FROM countries WHERE id="+id);
@@ -95,7 +98,7 @@ public class UpdateCountryWindow extends JFrame {
 			e1.printStackTrace();
 		}
 
-		
+		//Törlés gomb: csak egy megerõsítés kérés, 0 az igen
 		JButton btnDelete = new JButton("T\u00F6rl\u00E9s");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

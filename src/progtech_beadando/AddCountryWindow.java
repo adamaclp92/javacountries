@@ -59,7 +59,7 @@ public class AddCountryWindow extends JFrame {
 		textCountry.setColumns(10);
 		
 		
-		
+		//Ország hozzáadása: Ha egyik text mezõ sem üres, akkor hozzáadja a text mezõk tartalmát a countries táblához. Végül a mainwindow refresh (újra lekéri a táblába az adatokat)
 		JButton btnAddSubmit = new JButton("R\u00F6gz\u00EDt");
 		btnAddSubmit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -77,7 +77,7 @@ public class AddCountryWindow extends JFrame {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} 
-					
+					JOptionPane.showMessageDialog(null, "Sikeres rögzítés!");
 					mainWindow.refresh();
 					dispose();
 				}
